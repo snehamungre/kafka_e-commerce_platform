@@ -6,16 +6,25 @@ This project demonstrates a scalable Kafka-based pipeline simulating an e-commer
 
 ---
 
-## 🛠 Cluster Configuration
+## 🛠 Cluster Creation and Configuration
 The infrastructure consists of a **2-node Kafka Cluster** running in **KRaft mode**.
 
 * **Topics:** `orders`, `payments`, `shipments`
 * **Partitions:** 3 (to allow for parallel processing)
 * **Replication Factor:** 2 (to ensure fault tolerance)
+### Topic Creation `kafka-topics --create`
+![Topic Creation](screenshots/create_topic.png)
 
-### 📸 Evidence: Topic Configuration
+
+### Topic Configuration `kafka-topics --describe`
 ![Topic Configuration](screenshots/all_topics.png)
-> *This screenshot proves that all partitions have 2 replicas and are spread across both Broker 1 and Broker 2.*
+
+> *This screenshots show that all partitions have 2 replicas and are spread across both Broker 1 and Broker 2.*
+
+### Produce and Consume
+
+![Topic Configuration](screenshots/KAFKACLI_produce_consume.png)
+
 
 ---
 
@@ -36,7 +45,7 @@ Implements a strict schema check and business logic validation:
 ## 👥 Consumer Group Behavior
 One of the core requirements was to demonstrate how Kafka handles multiple consumers in a single group.
 
-### 📸 Evidence: Partition Assignment
+### Partition Assignment `kafka-consumer-groups --describe```
 By running two instances of `validation.py` simultaneously, Kafka automatically rebalanced the partitions:
 
 ![validation.py](screenshots/two_valid.png)
@@ -48,8 +57,6 @@ By running two instances of `validation.py` simultaneously, Kafka automatically 
 
 > *Note the two distinct Consumer IDs splitting the load.*
 
-
-
 ---
 
 ## 🛡 Fault Tolerance Simulation
@@ -57,13 +64,17 @@ To test the resilience of the system, we simulated a broker failure.
 
 1.  **Action:** `docker stop kafka2` while the producer was active.
 2.  **Observation:**
-    * The `validation` consumers experienced a brief connection warning.
+    * The `notification` consumers experienced a brief connection warning.
     * Kafka triggered a **Leader Election**.
     * Broker 1 took over leadership for all partitions.
     * **No data was lost**, and processing continued seamlessly.
 
-### 📸 Evidence: Broker Failover
-> **[Instruction: Insert screenshot of the `describe` command showing 'Isr' reduced to only Node 1, or Broker logs showing the disconnect]**
+###Broker Failover
+
+![Kafka Down.py](screenshots/kafka2_down.png)
+Showing the fact that only one cluster was up
+
+![Dropped Message](screenshots/dropped_cluster.png)
 
 ---
 
@@ -90,6 +101,8 @@ python orders.py
 docker exec -it kafka1 kafka-consumer-groups --bootstrap-server localhost:9092 --group validation --describe
 ```
 
+![Monitor](screenshots/descibing_things.png)
+
 ---
 
 ## 📝 Key Learnings
@@ -98,7 +111,3 @@ docker exec -it kafka1 kafka-consumer-groups --bootstrap-server localhost:9092 -
 * **Data Integrity:** Validated that using keys prevents "race conditions" where an order update might be processed before the order creation.
 
 ---
-
-### Pro-Tips for your Submission:
-* **Highlight the "Quantity > 0" logic:** In your `validation.py` code snippet, add a comment like `# Project Requirement: Business Logic Validation`.
-* **The "Split Terminal" Visual:** If you can, take one large screenshot of your VS Code window showing the **Split Terminals** (Producer on left, two Consumers on right). It looks very impressive in a documentation file.

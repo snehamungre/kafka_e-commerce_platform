@@ -48,8 +48,7 @@ for i in range(1, 101):
         value=json.dumps(data).encode("utf-8"),
         callback=delivery_report,
     )
-    
-    
+
     time.sleep(5)
 
 producer.flush()

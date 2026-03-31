@@ -8,7 +8,6 @@ consumer_config = {
 }
 
 
-
 consumer = Consumer(consumer_config)
 
 consumer.subscribe(["orders"])
