@@ -36,7 +36,7 @@ for i in range(1, 101):
             ]
         ),
         "price": random.randint(100, 5000),
-        "quantity": random.randint(1, 5),
+        "quantity": random.randint(0, 5),
         "timestamp": time.time(),
         "category": "Electronics",
     }
@@ -48,5 +48,8 @@ for i in range(1, 101):
         value=json.dumps(data).encode("utf-8"),
         callback=delivery_report,
     )
+    
+    
+    time.sleep(5)
 
 producer.flush()
