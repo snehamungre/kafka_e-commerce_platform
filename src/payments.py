@@ -1,4 +1,5 @@
 import json
+import random
 
 from confluent_kafka import Consumer
 
@@ -12,7 +13,7 @@ consumer = Consumer(consumer_config)
 
 consumer.subscribe(["orders"])
 
-print("🟢 Payments is running and subscribed to orders topic")
+print("Payments is running and subscribed to orders topic")
 
 try:
     while True:
@@ -25,11 +26,23 @@ try:
 
         value = msg.value().decode("utf-8")
         order = json.loads(value)
-        
-        #TODO
+
+        total = order["price"] * order["quantity"]
+
+        payment_success = random.random() < 0.8
+
+        if payment_success:
+            print(
+                f"✅ Payment of ₹{total} accepted for order {order['order_id']} by {order['user']}"
+            )
+        else:
+            print(
+                f"❌ Payment of ₹{total} FAILED for order {order['order_id']} by {order['user']}"
+            )
+
 
 except KeyboardInterrupt:
-    print("\n🔴 Stopping Payments")
+    print("\n🔴 Stopping Payment Service")
 
 finally:
     consumer.close()
