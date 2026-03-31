@@ -50,9 +50,30 @@ services:
 
       KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
   
-
     volumes:
       - kafka2_kraft:/var/lib/kafka/data
+
+  kafka-init:
+    image: confluentinc/cp-kafka:7.8.3
+    container_name: kafka-init
+    depends_on:
+      - kafka1
+      - kafka2
+    entrypoint: ["/bin/sh", "-c"]
+    command: |
+      "
+      echo 'Waiting for Kafka to be ready...'
+      cub kafka-ready -b kafka1:9093 2 60
+
+      echo 'Creating topics...'
+      kafka-topics --bootstrap-server kafka1:9093 --create --if-not-exists --topic orders --partitions 3 --replication-factor 2
+      kafka-topics --bootstrap-server kafka1:9093 --create --if-not-exists --topic payments --partitions 3 --replication-factor 2
+      kafka-topics --bootstrap-server kafka1:9093 --create --if-not-exists --topic shipments --partitions 3 --replication-factor 2
+
+      echo 'All topics created.'
+      kafka-topics --bootstrap-server kafka1:9093 --list
+      "
+    restart: "no"
 
 volumes:
   kafka1_kraft:
