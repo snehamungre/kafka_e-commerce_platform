@@ -1,6 +1,9 @@
 # Real-Time E-Commerce Event Streaming Platform
 **Kafka Intern Project 1**
 
+[Link to the second project](https://github.com/snehamungre/kafka_stream_analytics)
+
+
 ## 📌 Project Overview
 This project demonstrates a scalable Kafka-based pipeline simulating an e-commerce system. It handles order validation and notification services with a focus on partitioning correctness, consumer group scalability, and high availability.
 
